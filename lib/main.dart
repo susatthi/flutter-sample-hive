@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  await Hive.openBox<int>('counter');
   runApp(const MyApp());
 }
 
@@ -30,10 +34,19 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  late Box _box;
+
+  @override
+  void initState() {
+    super.initState();
+    _box = Hive.box<int>('counter');
+    _counter = _box.get('counter', defaultValue: 0) ?? 0;
+  }
 
   void _incrementCounter() {
     setState(() {
       _counter++;
+      _box.put('counter', _counter);
     });
   }
 
